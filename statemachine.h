@@ -1,0 +1,15 @@
+﻿#ifndef STATEMACHINE_H
+#define STATEMACHINE_H
+
+enum states{
+    WERTE,ZEIT,HAUPTMENU,MENU1,MENU2,MENU3,MENU1_1,MENU1_2,MENU1_3,MENU1_4,
+    MENU2_1,MENU2_2,MENU3_1,MENU3_2,MENU3_3,MENU3_4
+};
+
+enum zeilen{
+    ERSTE=1,ZWEITE,DRITTE,VIERTE
+};
+
+void processEvent(char taste);
+
+#endif /* STATEMACHINE_H */

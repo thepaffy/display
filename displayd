@@ -1,0 +1,67 @@
+#!/bin/bash
+
+         ##Daemon um kc-display beim Systemstart zu starten##
+		 
+#Diese Datei anpassen und in den Ordner /etc/init.d kopieren dann mit root rechten per 'chmod 755' ausführbar machen.
+#Anschließend mit root rechten per 'update-rc.d displayd defaults' in die runlevel eintragen.
+
+### BEGIN INIT INFO
+# Provides:          kc-display starten
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: kc-display starten
+# Description:       kc-display starten
+### END INIT INFO
+# Author: Christian Paffhausen <c.paffhausen@gmx.de>
+
+
+program=/opt/lcd_display/display   # Pfad anpassen programm=/pfad/zu/kc-display
+progname=display                   # Programmnamen anpassen
+
+#Actions
+case "$1" in
+    start)
+        if [ ! -f /tmp/$progname.pid ]; then
+            $program & #start prog
+            if [ $? -ne 0 ]; then
+                echo "Starting $progname failed with error $?" >&2
+                return $? #return errcode
+            fi
+            echo $! > /tmp/$progname.pid #save PID
+            echo "Started $progname with PID $!"
+        else
+        echo "$progname already started with PID $(cat /tmp/$progname.pid)" >&2 #print as error as it isnt
+        fi
+        ;;
+    stop)
+        if [ -f /tmp/$progname.pid ]; then
+            pid=$(cat /tmp/$progname.pid) #read PID from file
+            kill $pid #kill prog
+            if ([ $? -ne 0 ] && [ $? -ne 130 ]); then
+                kill -9 $pid #force kill
+            fi
+            if ([ $? -ne 0 ] && [ $? -ne 130 ]); then
+                echo "Killing $progname with PID $pid failed with error $?" >&2
+                exit $? #return errcode
+            fi
+            rm /tmp/$progname.pid #remove pidfile
+            echo "Stopped $progname with PID $pid"
+        else
+            echo "$progname not running" >&2 #print as error as it isnt
+        fi
+        ;;
+    restart)
+    $0 stop
+    if [ $? -ne 0 ]; then
+        exit $?
+    fi
+    $0 start
+    if [ $? -ne 0 ]; then
+        exit $?
+    fi
+    ;;
+esac
+
+exit 0
